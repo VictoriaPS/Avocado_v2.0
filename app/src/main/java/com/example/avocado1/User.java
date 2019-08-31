@@ -1,10 +1,13 @@
 package com.example.avocado1;
 
+import java.util.List;
+
 public class User {
     private String id;
     private String Email;
     private  String Password;
     private  String UserName;
+    private List Prefrences;
 
     public User() {
 
@@ -15,6 +18,7 @@ public class User {
         Email = email;
         Password = password;
         UserName = userName;
+
     }
 
     public String getId() {

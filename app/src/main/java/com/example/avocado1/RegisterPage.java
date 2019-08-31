@@ -37,8 +37,7 @@ public class RegisterPage extends AppCompatActivity {
     Button submitBtn;
     DatabaseReference databaseRef;
     ProgressBar progressBar;
-    TextView loginBtn;
-    Button authBtn;
+    Button LoginBtn;
     private FirebaseAuth mAuth;
     private static final String TAG= RegisterPage.class.getName();
 
@@ -58,15 +57,17 @@ public class RegisterPage extends AppCompatActivity {
         submitBtn= findViewById(R.id.submitId);
         error= findViewById(R.id.errorId);
         progressBar= findViewById(R.id.progressBarId);
-        loginBtn = findViewById(R.id.LoginId);
+        LoginBtn = findViewById(R.id.loginId);
         user = new User();
-        authBtn= findViewById(R.id.authId);
+        //authBtn= findViewById(R.id.authId);
+        submitBtn= findViewById(R.id.submitId);
+
 
 
         databaseRef= FirebaseDatabase.getInstance().getReference("Users");
         mAuth= FirebaseAuth.getInstance();
 
-        loginBtn.setOnClickListener(new View.OnClickListener() {
+        LoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent myIntent = new Intent(view.getContext(), LoginPage.class);
@@ -75,9 +76,9 @@ public class RegisterPage extends AppCompatActivity {
         });
 
 
-
+/*
         submitBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
+           @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
                 AddUserToDb();
@@ -85,7 +86,7 @@ public class RegisterPage extends AppCompatActivity {
 
             }
 
-            private void AddUserToDb(){
+      /*      private void AddUserToDb(){
                 databaseRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -112,7 +113,7 @@ public class RegisterPage extends AppCompatActivity {
                     }
 
                     if(Password.length()<6){
-                        error.setError("Minimum length of password should bw 4");
+                        error.setError("Minimum length of password should be 6");
                         error.requestFocus();
                         return;
                     }
@@ -139,20 +140,20 @@ public class RegisterPage extends AppCompatActivity {
 
 
             }
+*/
 
 
 
 
-        });
 
-        authBtn.setOnClickListener(new View.OnClickListener() {
+        submitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
 
                 String Email2 = email.getText().toString().trim();
                 String Password2= password.getText().toString().trim();
-                //Toast.makeText(getApplicationContext(), "press is successfull",Toast.LENGTH_LONG).show();
+                //Toast.makeText(getApplicationContext(), "press is successful",Toast.LENGTH_LONG).show();
 
 
                 mAuth.createUserWithEmailAndPassword(Email2,Password2).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -160,11 +161,11 @@ public class RegisterPage extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()){
                             Log.d(TAG, "createUserWithEmail:success");
-                            Toast.makeText(RegisterPage.this, "successfull",Toast.LENGTH_LONG).show();
+                            Toast.makeText(RegisterPage.this, "User Was Created!",Toast.LENGTH_LONG).show();
 
                         }
                         if(!task.isSuccessful()){
-                            Toast.makeText(RegisterPage.this, "User Authentication Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterPage.this, "User Creation Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             //Toast.makeText(RegisterPage.this, "not successfull",Toast.LENGTH_LONG).show();
                             //Log.w(TAG, "failier", task.getException());
 

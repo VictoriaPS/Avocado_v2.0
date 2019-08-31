@@ -1,7 +1,9 @@
 package com.example.avocado1;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
 import android.view.View;
@@ -21,6 +23,7 @@ public class ProfilePage extends AppCompatActivity {
     Button Btn;
     TextView Email;
     DatabaseReference reff;
+    private Toolbar toolbar;
 
 
     @Override
@@ -28,11 +31,18 @@ public class ProfilePage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_page);
 
+        setSupportActionBar(toolbar);
+
+        ActionBar actionBar= getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
 
 
         User= findViewById(R.id.enteruserId);
         Email= findViewById(R.id.showemailId);
         Btn= findViewById(R.id.seeemailId);
+        toolbar= findViewById(R.id.toolbarId);
+
 
 
 
