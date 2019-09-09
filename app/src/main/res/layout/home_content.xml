@@ -9,6 +9,7 @@
     tools:showIn="@layout/home_toolbar">
 
     <TextView
+        android:id="@+id/helloUserId"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Home Page"

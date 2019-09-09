@@ -2,10 +2,12 @@ package com.example.avocado1;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ public class ChooseGenresPage extends AppCompatActivity {
     private CheckBox check_horror;
     private CheckBox check_scifi;
     private Button chooseBtn;
+    private User user;
+    private TextView goToHome;
 
 
     @Override
@@ -28,6 +32,18 @@ public class ChooseGenresPage extends AppCompatActivity {
         setContentView(R.layout.activity_choose_genres_page);
 
         chooseBtn= findViewById(R.id.chooseBtnId);
+        goToHome= findViewById(R.id.goToHomeId);
+
+        String currentUser = getIntent().getStringExtra("Current user");
+        String currentEmail=getIntent().getStringExtra("current email");
+        final Intent HomeIntent = new Intent(ChooseGenresPage.this, HomePage.class);
+
+
+        Toast.makeText(ChooseGenresPage.this,"Uid:"+currentUser,Toast.LENGTH_LONG).show();
+        Toast.makeText(ChooseGenresPage.this,"User Email:"+currentEmail,Toast.LENGTH_LONG).show();
+
+
+
 
 
 
@@ -43,6 +59,7 @@ public class ChooseGenresPage extends AppCompatActivity {
 
                 if (check_action.isChecked()) {
                     selectedGenres.add("Action");
+
                 }
                 if (check_comedy.isChecked()){
                     selectedGenres.add("Comedy");
@@ -60,6 +77,15 @@ public class ChooseGenresPage extends AppCompatActivity {
 
 
                 Toast.makeText(ChooseGenresPage.this, selectedGenres.toString(),Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+        goToHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivityForResult(HomeIntent, 0);
+
 
             }
         });

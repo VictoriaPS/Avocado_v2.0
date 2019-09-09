@@ -18,15 +18,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 
 public class HomePage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Toolbar toolbar;
+    private TextView helloUser;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
+    private TextView emailNav;
 
 
     @Override
@@ -34,19 +41,36 @@ public class HomePage extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
         toolbar = findViewById(R.id.toolbarId);
-        String currentUser = getIntent().getStringExtra("Current user");
+        helloUser= findViewById(R.id.helloUserId);
+        emailNav= findViewById(R.id.emailNavBarId);
+        String currentUser = getIntent().getStringExtra("CurrentUserName");
+        String currentEmail=getIntent().getStringExtra("current email");
+        helloUser.setText("ברוכים הבאים, "+currentUser);
+
+
+
+
 
         setSupportActionBar(toolbar);
 
 
+
+
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+
         DrawerLayout drawer = findViewById(R.id.drawerLayoutId);
-        NavigationView navigationView = findViewById(R.id.navViewId);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navViewId);
+        navigationView.setNavigationItemSelectedListener(this);
+
+
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+
 
 
     }
@@ -57,6 +81,8 @@ public class HomePage extends AppCompatActivity
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.home_menu, menu);
         return super.onCreateOptionsMenu(menu);
+
+
     }
 
     @Override
