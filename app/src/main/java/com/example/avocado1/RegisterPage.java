@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
@@ -35,10 +36,9 @@ import java.util.prefs.Preferences;
 
 public class RegisterPage extends AppCompatActivity {
 
-    EditText username;
-    EditText email;
-    EditText password;
-    EditText error;
+    EditText editTextUsername;
+    EditText editTextEmail;
+    EditText editTextPassword;
     Button submitBtn;
     User user;
     FirebaseDatabase databaseRef;
@@ -48,7 +48,12 @@ public class RegisterPage extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private static final String TAG = RegisterPage.class.getName();
 
-    private void AddUserToDb(){
+
+
+
+
+
+    private void AddUserToDb(String Email, String Password, String UserName) {
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -61,74 +66,38 @@ public class RegisterPage extends AppCompatActivity {
             }
         });
 
-        String Email = email.getText().toString().trim();
-        String Password = password.getText().toString().trim();
-        String UserName = username.getText().toString().trim();
+
+        String id = userRef.push().getKey();
+        //example
+        List<String> Preferences = Arrays.asList("action", "");
+        List<String> FavMovies = Arrays.asList("Avengers:Endgame", "Terminator");
+        List<String> FavTVshows = Arrays.asList("Breaking Bad", "Black Mirror", "Games of Thrones");
+
+        User user = new User(id, Email, Password, UserName, Preferences, FavMovies, FavTVshows);
 
 
-
-                if(!TextUtils.isEmpty(Email)&& !TextUtils.isEmpty(Password)&& !TextUtils.isEmpty(UserName)){
-
-                    if(!Patterns.EMAIL_ADDRESS.matcher(Email).matches()){
-                        error.setError("Please enter a valid Email Address");
-                        error.requestFocus();
-                        return;
-                    }
-
-                    if(Password.length()<6){
-                        error.setError("Minimum length of password should be 6");
-                        error.requestFocus();
-                        return;
-                    }
+        userRef.child(UserName);
+        userRef.child(UserName).setValue(user);
+        progressBar.setVisibility(View.GONE);
+        Toast.makeText(RegisterPage.this, "user added to db", Toast.LENGTH_LONG).show();
 
 
+    }
 
 
-
-                    String id=userRef.push().getKey();
-                    //example
-                    List<String> Preferences= Arrays.asList("action", "");
-                    List<String> FavMovies= Arrays.asList("Avengers:Endgame", "Terminator");
-                    List<String> FavTVshows= Arrays.asList("Breaking Bad", "Black Mirror", "Games of Thrones");
-
-                    User user= new User(id,Email,Password,UserName, Preferences, FavMovies, FavTVshows);
-
-
-                    userRef.child(id);
-                    userRef.child(id).setValue(user);
-                    progressBar.setVisibility(View.GONE);
-                    Toast.makeText(RegisterPage.this, "user added to db",Toast.LENGTH_LONG).show();
-
-
-
-
-                }
-                else{
-                    error.setError("Please enter Email and Password!");
-                    error.requestFocus();
-                    return;                }
-
-
-
-
-           }
-    private void UserProfile(){
-        FirebaseUser user= mAuth.getCurrentUser();
-        if (user!=null)
-        {
-            UserProfileChangeRequest ProfileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(username.getText().toString().trim()).build();
+    private void UserProfile() {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            UserProfileChangeRequest ProfileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(editTextUsername.getText().toString().trim()).build();
 
             user.updateProfile(ProfileUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
-                    Toast.makeText(getApplicationContext(), "user profile updated",Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "user profile updated", Toast.LENGTH_LONG).show();
                 }
             });
         }
     }
-
-
-
 
 
     @Override
@@ -137,25 +106,18 @@ public class RegisterPage extends AppCompatActivity {
         setContentView(R.layout.activity_register_page);
 
 
-        email = findViewById(R.id.emailRegId);
-        password = findViewById(R.id.passRegId);
-        username = findViewById(R.id.usernameId);
-        error = findViewById(R.id.errorId);
+        editTextEmail = findViewById(R.id.emailRegId);
+        editTextPassword = findViewById(R.id.passRegId);
+        editTextUsername = findViewById(R.id.usernameId);
         progressBar = findViewById(R.id.progressBarId);
         LoginBtn = findViewById(R.id.LoginId);
         user = new User();
-        //authBtn= findViewById(R.id.authId);
         submitBtn = findViewById(R.id.submitId);
 
 
         databaseRef = FirebaseDatabase.getInstance();
         userRef = databaseRef.getReference("Users");
         mAuth = FirebaseAuth.getInstance();
-
-
-
-
-
 
 
         LoginBtn.setOnClickListener(new View.OnClickListener() {
@@ -167,62 +129,75 @@ public class RegisterPage extends AppCompatActivity {
         });
 
 
-        //  submitBtn.setOnClickListener(new View.OnClickListener() {
-        //     @Override
-        //     public void onClick(View view) {
-        //         progressBar.setVisibility(View.VISIBLE);
-        //        AddUserToDb();
-
-
-
         submitBtn.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View view) {
-                                           AddUserToDb();
+            @Override
+            public void onClick(View view) {
 
-                                             String Email2 = email.getText().toString().trim();
-                                             String Password2 = password.getText().toString().trim();
-                                             String userName = username.getText().toString().trim();
-                                             //Toast.makeText(getApplicationContext(), "press is successful",Toast.LENGTH_LONG).show();
+                String Email = editTextEmail.getText().toString().trim();
+                String Password = editTextPassword.getText().toString().trim();
+                String UserName = editTextUsername.getText().toString().trim();
 
 
-                                             mAuth.createUserWithEmailAndPassword(Email2, Password2).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                                 @Override
-                                                 public void onComplete(@NonNull Task<AuthResult> task) {
-                                                     if (task.isSuccessful()) {
-                                                         Log.d(TAG, "createUserWithEmail:success");
+                if (Email.isEmpty()) {
+                    editTextEmail.setError("Email is required");
+                    editTextEmail.requestFocus();
+                    return;
+                }
+                if (!Patterns.EMAIL_ADDRESS.matcher(Email).matches()) {
+                    editTextEmail.setError("Please enter a valid email");
+                    editTextEmail.requestFocus();
+                    return;
+                }
 
-                                                         Toast.makeText(RegisterPage.this, "User auth was created!", Toast.LENGTH_LONG).show();
-                                                         UserProfile();
+                if (Password.isEmpty()) {
+                    editTextPassword.setError("Password is required");
+                    editTextPassword.requestFocus();
+                    return;
+                }
+                if (editTextPassword.length() < 6) {
+                    editTextPassword.setError("Minimum lenght of password should be 6");
+                    editTextPassword.requestFocus();
+                    return;
+                }
+
+                if (UserName.isEmpty()) {
+                    editTextUsername.setError("User Name is required");
+                    editTextUsername.requestFocus();
+                    return;
+                }
+
+                progressBar.setVisibility(View.VISIBLE);
 
 
+                AddUserToDb(Email,Password,UserName);
 
-                                                     }
-                                                     if (!task.isSuccessful()) {
-                                                         Toast.makeText(RegisterPage.this, "User Creation Failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                                         //Toast.makeText(RegisterPage.this, "not successfull",Toast.LENGTH_LONG).show();
-                                                         //Log.w(TAG, "failier", task.getException());
 
-                                                         //Toast.makeText(RegisterPage.this, "not working",Toast.LENGTH_LONG).show();
-                                                         // FirebaseAuthException e= (FirebaseAuthException)task.getException();
-                                                         // Log.d(TAG, "createUserWithEmail:failure", e);
-                                                         //  Toast.makeText(getApplicationContext(), "Authentication failed."+e.getMessage(),
-                                                         //     Toast.LENGTH_SHORT).show();
-                                                     }
+                mAuth.createUserWithEmailAndPassword(Email, Password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        progressBar.setVisibility(View.GONE);
+                        if (task.isSuccessful()) {
 
-                                                 }
+                            Toast.makeText(RegisterPage.this, "User auth was created!", Toast.LENGTH_LONG).show();
+                            UserProfile();
+                            startActivity(new Intent(RegisterPage.this, HomePage.class));
 
-                                             });
+                        } else {
+                            if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                                Toast.makeText(getApplicationContext(), "You are already registered", Toast.LENGTH_SHORT).show();
 
-                                         }
-                                     }
-        );
+                            } else {
+                                Toast.makeText(getApplicationContext(), "User Creation Failed due to: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
 
+                        }
+                    }
+                });
+
+            }
+
+
+        });
 
     }
-
-
 }
-
-
-

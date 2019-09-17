@@ -9,36 +9,213 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.Navigation;
 
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-public class AccountPage extends OptionsMenu
-{
-private Toolbar toolbar;
+import java.util.ArrayList;
+import java.util.List;
+
+public class AccountPage extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
+
+        private Toolbar toolbar;
+        TextView textViewEmail;
+        Button ButtonEditGenres;
+        TextView textViewDisplayName;
+        TextView textViewSelectedGenres;
+        FirebaseAuth mAuth;
+        private FirebaseDatabase mFirebaseDatabase;
+        private FirebaseAuth.AuthStateListener mAuthListener;
+        private DatabaseReference myRef;
+        private List<String> genres = new ArrayList<>();
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+        @Override
+        protected void onCreate (Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_page);
 
-        toolbar= findViewById(R.id.toolbarId);
+        toolbar = findViewById(R.id.toolbarId);
         setSupportActionBar(toolbar);
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        myRef = mFirebaseDatabase.getReference();
+        FirebaseUser user = mAuth.getCurrentUser();
+        textViewDisplayName = (TextView) findViewById(R.id.accountName);
+        textViewSelectedGenres = (TextView) findViewById(R.id.selectedGenres);
+        textViewEmail = (TextView) findViewById(R.id.accountEmail);
+        ButtonEditGenres = (Button) findViewById(R.id.editGenres);
+
+
+        loadUserInformation(genres);
+        //genres = updateGenres(genres);
+        //setSelected(genres);
+
+        ButtonEditGenres.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(AccountPage.this, ChooseGenresPage.class));
+            }
+        });
+
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater menuInflater=getMenuInflater();
+
+        @Override
+        public boolean onCreateOptionsMenu (Menu menu){
+        MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.home_menu, menu);
         return true;
 
 
+    }
+
+        private void loadUserInformation (List<String> genres) {
+
+
+        final FirebaseUser user = mAuth.getCurrentUser();
+        if (user.getDisplayName() != null) {
+            textViewDisplayName.setText("החשבון של " + user.getDisplayName());
+        }
+        textViewEmail.setText(mAuth.getCurrentUser().getEmail());
+
+        updateGenres(genres);
 
     }
-}
+
+
+        private List<String> updateGenres ( final List<String> genres){
+
+        myRef = FirebaseDatabase.getInstance().getReference("Users");
+        final String userName = mAuth.getCurrentUser().getDisplayName().toString();
+
+
+        myRef.child(userName).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                genres.add(dataSnapshot.child("preferences").getValue().toString());
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        setSelected(genres);
+
+        return genres;
+
+
+    }
+
+
+        private void setSelected ( final List<String> genres){
+
+        myRef = FirebaseDatabase.getInstance().getReference("Users");
+        final String userName = mAuth.getCurrentUser().getDisplayName().toString();
+        myRef.child(userName).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+
+                String genres = dataSnapshot.child("preferences").getValue().toString();
+                genres = genres.replace("[", "");
+                genres = genres.replace("]", "");
+
+                textViewSelectedGenres.setText(genres);
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+        public boolean onNavigationItemSelected (MenuItem item){
+       ///
+        return true;
+
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.action_homeId:
+                Intent HomeIntent = new Intent(this, HomePage.class);
+                startActivity(HomeIntent);
+                return true;
+
+
+
+            case R.id.action_accountId:
+                Intent AccountIntent = new Intent(this, AccountPage.class);
+                startActivity(AccountIntent);
+                return true;
+
+            case R.id.action_notificationId:
+                Toast.makeText(this, "notifications selected", Toast.LENGTH_LONG).show();
+                return true;
+
+            case R.id.action_genresId:
+                Toast.makeText(this, "genres selected", Toast.LENGTH_LONG).show();
+                return true;
+
+            case R.id.action_moviesId:
+                Toast.makeText(this, "movies selected", Toast.LENGTH_LONG).show();
+                return true;
+
+            case R.id.action_tvShowsId:
+                Toast.makeText(this, "tvShows selected", Toast.LENGTH_LONG).show();
+                return true;
+
+
+            case R.id.action_signOutId:
+                Intent signOutIntent = new Intent(this, LoginPage.class);
+                startActivity(signOutIntent);
+                return true;
+
+
+            default:
+                return super.onOptionsItemSelected(item);
+
+        }
+
+
+    }
+    }
+

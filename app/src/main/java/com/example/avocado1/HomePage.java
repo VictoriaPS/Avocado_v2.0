@@ -24,38 +24,38 @@ import android.widget.Toast;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 
 
 public class HomePage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final String TAG = "ViewDatabase";
     private Toolbar toolbar;
     private TextView helloUser;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private TextView emailNav;
+    private FirebaseDatabase mFirebaseDatabase;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    private DatabaseReference myRef;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_page);
+
+        mAuth = FirebaseAuth.getInstance();
+        final FirebaseUser user = mAuth.getCurrentUser();
+
+
         toolbar = findViewById(R.id.toolbarId);
-        helloUser= findViewById(R.id.helloUserId);
         emailNav= findViewById(R.id.emailNavBarId);
-        String currentUser = getIntent().getStringExtra("CurrentUserName");
-        String currentEmail=getIntent().getStringExtra("current email");
-        helloUser.setText("ברוכים הבאים, "+currentUser);
-
-
-
-
-
         setSupportActionBar(toolbar);
-
-
-
-
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -74,6 +74,40 @@ public class HomePage extends AppCompatActivity
 
 
     }
+    @Override
+    public void onStart() {
+        super.onStart();
+        checkAuth();
+//        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+
+    private void checkAuth() {
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    Toast.makeText(HomePage.this, "Successfully signed in with: " + user.getEmail(),Toast.LENGTH_LONG).show();
+
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                    Toast.makeText(HomePage.this, "Successfully signed out " + user.getEmail(),Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+    }
+
+    private void logout(){
+        FirebaseAuth.getInstance().signOut();
+        Intent intent= new Intent(getApplicationContext(),LoginPage.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -145,27 +179,8 @@ public class HomePage extends AppCompatActivity
        */ }
 
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        /*int id = item.getItemId();
 
-        if (id == R.id.nav_home) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_tools) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-
-    */  return true;
+     return true;
 
     }
 }

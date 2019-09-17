@@ -16,11 +16,17 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.Navigation;
 
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 
 public class OptionsMenu extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
+
+   // private static final OptionsMenu ourInstance = new OptionsMenu();
 
     private Toolbar toolbar;
     Intent AccountPageIntent = new Intent(this, AccountPage.class);
@@ -77,7 +83,7 @@ public class OptionsMenu extends AppCompatActivity
                 return true;
 
             case R.id.action_genresId:
-                Toast.makeText(this, "genres selected", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(OptionsMenu.this, ChooseGenresPage.class));
                 return true;
 
             case R.id.action_moviesId:
@@ -90,9 +96,24 @@ public class OptionsMenu extends AppCompatActivity
 
 
             case R.id.action_signOutId:
-                Intent signOutIntent = new Intent(this, LoginPage.class);
-                startActivity(signOutIntent);
-                return true;
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                // user is now signed out
+                                startActivity(new Intent(OptionsMenu.this, AccountPage.class));
+                                finish();
+                               // ourInstance.finish();
+
+                            }
+                       });
+
+
+
+
+            // Intent signOutIntent = new Intent(this, LoginPage.class);
+                //startActivity(signOutIntent);
+               // return true;
 
 
             default:
@@ -135,6 +156,13 @@ public class OptionsMenu extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
 
     */  return true;
+
+    }
+
+    private void logout(){
+        FirebaseAuth.getInstance().signOut();
+        Intent intent = new Intent(this, LoginPage.class);
+        startActivity(intent);
 
     }
 }
