@@ -13,8 +13,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".BaseActivity"></activity>
-        <activity android:name=".HomePage" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/Calendar_API_KEY"></meta-data>
+
+
+        <activity android:name=".BaseActivity" />
+        <activity android:name=".LoginPage" />
         <activity android:name=".ChooseGenresPage" />
         <activity android:name=".RegisterPage" />
         <activity
@@ -31,7 +36,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LoginPage" />
         </activity>
-        <activity android:name=".LoginPage">
+        <activity android:name=".HomePage">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

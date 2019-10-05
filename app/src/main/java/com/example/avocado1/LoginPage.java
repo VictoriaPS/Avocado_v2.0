@@ -35,9 +35,7 @@ public class LoginPage extends BaseActivity {
      EditText editTextPassword, editTextEmail;
      Button loginBtn;
      ProgressBar progressBar;
-     private FirebaseDatabase fbdb;
-     private DatabaseReference ref;
-    DatabaseReference reff;
+    DatabaseReference myRef;
 
 
     private static final String TAG= LoginPage.class.getName();
@@ -58,9 +56,6 @@ public class LoginPage extends BaseActivity {
          loginBtn= findViewById(R.id.loginId);
          progressBar= findViewById(R.id.progressBarId);
          mAuth= FirebaseAuth.getInstance();
-
-         final Intent HomeIntent = new Intent(LoginPage.this, HomePage.class);
-         final Intent ChooseGenersIntent = new Intent(LoginPage.this, ChooseGenresPage.class);
 
 
 
@@ -112,13 +107,12 @@ public class LoginPage extends BaseActivity {
                              Log.d(TAG, "success");
                              FirebaseUser currentUser = mAuth.getCurrentUser();
 
-                             String userEmail,userId;
+                             String userEmail;
                              userEmail=currentUser.getEmail();
-                             userId= currentUser.getUid();
 
-                             reff= FirebaseDatabase.getInstance().getReference("Users");
+                             myRef= FirebaseDatabase.getInstance().getReference("Users");
 
-                             reff.addValueEventListener(new ValueEventListener() {
+                             myRef.addValueEventListener(new ValueEventListener() {
                                  @Override
                                  public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                      }

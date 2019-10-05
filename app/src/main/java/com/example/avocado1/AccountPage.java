@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -24,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
@@ -46,6 +48,8 @@ public class AccountPage extends AppCompatActivity
         Button ButtonEditGenres;
         TextView textViewDisplayName;
         TextView textViewSelectedGenres;
+        CalendarView calendarView;
+        Button btnSaveDate;
         FirebaseAuth mAuth;
         private FirebaseDatabase mFirebaseDatabase;
         private FirebaseAuth.AuthStateListener mAuthListener;
@@ -68,16 +72,26 @@ public class AccountPage extends AppCompatActivity
         textViewSelectedGenres = (TextView) findViewById(R.id.selectedGenres);
         textViewEmail = (TextView) findViewById(R.id.accountEmail);
         ButtonEditGenres = (Button) findViewById(R.id.editGenres);
+        calendarView= (CalendarView) findViewById(R.id.calendarView);
+        btnSaveDate= (Button) findViewById(R.id.btnSaveDate);
 
 
         loadUserInformation(genres);
-        //genres = updateGenres(genres);
-        //setSelected(genres);
 
         ButtonEditGenres.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(AccountPage.this, ChooseGenresPage.class));
+            }
+        });
+
+        calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+            @Override
+            public void onSelectedDayChange(CalendarView calendarView, int i, int i1, int i2) {
+                String date= i2 + "/" +(i1+1) + "/" +i;
+                Toast.makeText(getApplicationContext(), "date:"+ date, Toast.LENGTH_LONG).show();
+
+
             }
         });
 
@@ -121,6 +135,7 @@ public class AccountPage extends AppCompatActivity
                 genres.add(dataSnapshot.child("preferences").getValue().toString());
 
 
+
             }
 
             @Override
@@ -130,6 +145,7 @@ public class AccountPage extends AppCompatActivity
         });
 
         setSelected(genres);
+
 
         return genres;
 
@@ -205,6 +221,14 @@ public class AccountPage extends AppCompatActivity
 
 
             case R.id.action_signOutId:
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                // user is now signed out
+                            }
+                        });
+                Toast.makeText(this, "signed out", Toast.LENGTH_LONG).show();
                 Intent signOutIntent = new Intent(this, LoginPage.class);
                 startActivity(signOutIntent);
                 return true;

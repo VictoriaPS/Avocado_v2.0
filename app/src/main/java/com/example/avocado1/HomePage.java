@@ -12,22 +12,35 @@ import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
 
 
-
+import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class HomePage extends AppCompatActivity
@@ -42,6 +55,10 @@ public class HomePage extends AppCompatActivity
     private FirebaseDatabase mFirebaseDatabase;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private DatabaseReference myRef;
+    private List<String> genresList = new ArrayList<>();
+    private Button buttons[]= new Button[5];
+    TextView textViewDisplayName;
+    TextView textViewDisplayGenres;
 
 
     @Override
@@ -51,6 +68,8 @@ public class HomePage extends AppCompatActivity
 
         mAuth = FirebaseAuth.getInstance();
         final FirebaseUser user = mAuth.getCurrentUser();
+        textViewDisplayName = (TextView) findViewById(R.id.helloUser);
+        textViewDisplayGenres= (TextView) findViewById(R.id.genres);
 
 
         toolbar = findViewById(R.id.toolbarId);
@@ -70,6 +89,11 @@ public class HomePage extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        loadUserInformation();
+        updateGenres(genresList);
+        DisplayGenres(buttons);
+
+
 
 
 
@@ -77,9 +101,74 @@ public class HomePage extends AppCompatActivity
     @Override
     public void onStart() {
         super.onStart();
-        checkAuth();
+       // checkAuth();
 //        mAuth.addAuthStateListener(mAuthListener);
     }
+    private void loadUserInformation () {
+
+
+        final FirebaseUser user = mAuth.getCurrentUser();
+        if (user.getDisplayName() != null) {
+            textViewDisplayName.setText("ברוכים הבאים,  " + user.getDisplayName()+ "!");
+        }
+
+
+    }
+
+    private void updateGenres ( final List<String> genres){
+
+        myRef = FirebaseDatabase.getInstance().getReference("Users");
+        final String userName = mAuth.getCurrentUser().getDisplayName();
+
+        myRef.child(userName).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String genres = dataSnapshot.child("preferences").getValue().toString();
+
+                genres = genres.replace("[", "");
+                genres = genres.replace("]", "");
+
+                textViewDisplayGenres.setText(genres);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
+
+    }
+
+    private void DisplayGenres (final Button buttons[]){
+        myRef = FirebaseDatabase.getInstance().getReference("Users");
+        final String userName = mAuth.getCurrentUser().getDisplayName();
+
+
+        myRef.child(userName).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String genresStr= textViewDisplayGenres.getText().toString();
+
+                long numOfGenres= dataSnapshot.child("preferences").getChildrenCount();
+
+                createButtons(genresStr,numOfGenres);
+
+
+
+
+
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        }
+
 
 
     private void checkAuth() {
@@ -101,12 +190,39 @@ public class HomePage extends AppCompatActivity
         };
     }
 
-    private void logout(){
-        FirebaseAuth.getInstance().signOut();
-        Intent intent= new Intent(getApplicationContext(),LoginPage.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+    private void createButtons(String genreStr, long numOfGenres){
+        Log.d(TAG, "string: " + genreStr);
+
+
+        List<String> genresList= Arrays.asList(genreStr.split("\\s*,\\s*"));
+        Toast.makeText(HomePage.this, "genres list from func: " + genresList,Toast.LENGTH_LONG).show();
+
+        LinearLayout linearLayout= (LinearLayout)findViewById(R.id.buttonsLayout);
+        LinearLayout.LayoutParams layoutParams= new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        int color= 0x5AB300;
+
+        for (int i=0; i<numOfGenres; i++){
+
+            Button genresBtn= new Button(this);
+            linearLayout.addView(genresBtn);
+            genresBtn.setText(genresList.get(i));
+            //genresBtn.setBackgroundColor(Color.RED);
+
+            //genresBtn.getBackground().setColorFilter(new LightingColorFilter(0xFFFFFFFF, color));
+
+
+
+
+
+        }
+
+
+
+
+
     }
+
 
 
     @Override
@@ -154,6 +270,14 @@ public class HomePage extends AppCompatActivity
 
 
             case R.id.action_signOutId:
+                AuthUI.getInstance()
+                        .signOut(this)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            public void onComplete(@NonNull Task<Void> task) {
+                                // user is now signed out
+                            }
+                        });
+                Toast.makeText(this, "signed out", Toast.LENGTH_LONG).show();
                 Intent signOutIntent = new Intent(this, LoginPage.class);
                 startActivity(signOutIntent);
                 return true;

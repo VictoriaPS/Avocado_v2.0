@@ -19,64 +19,22 @@ import com.google.firebase.database.ValueEventListener;
 
 public class ProfilePage extends AppCompatActivity {
 
-    TextView User;
-    Button Btn;
-    TextView Email;
-    DatabaseReference reff;
-    private Toolbar toolbar;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile_page);
-
-        setSupportActionBar(toolbar);
-
-        ActionBar actionBar= getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
 
 
-
-        User= findViewById(R.id.enteruserId);
-        Email= findViewById(R.id.showemailId);
-        Btn= findViewById(R.id.seeemailId);
-        toolbar= findViewById(R.id.toolbarId);
+        myRef.setValue("Hello, World!");
 
 
-
-
-
-
-        Btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-
-                String user= User.getText().toString().trim();
-                reff= FirebaseDatabase.getInstance().getReference("Users").child(user);
-
-
-
-                 reff.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-
-                        User user= dataSnapshot.getValue(User.class);
-                        Email.setText(user.getEmail());
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Toast.makeText(ProfilePage.this, "failed to read"+ databaseError.toException(),Toast.LENGTH_SHORT).show();
-
-
-                    }
-                });
-            }
-        });
 
     }
+
+
+
 }

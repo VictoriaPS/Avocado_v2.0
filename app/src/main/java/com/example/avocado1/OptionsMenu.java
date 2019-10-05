@@ -101,19 +101,14 @@ public class OptionsMenu extends AppCompatActivity
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             public void onComplete(@NonNull Task<Void> task) {
                                 // user is now signed out
-                                startActivity(new Intent(OptionsMenu.this, AccountPage.class));
-                                finish();
-                               // ourInstance.finish();
 
                             }
-                       });
+                        });
+                Toast.makeText(this, "signed out", Toast.LENGTH_LONG).show();
+                Intent signOutIntent = new Intent(this, LoginPage.class);
+                startActivity(signOutIntent);
+                return true;
 
-
-
-
-            // Intent signOutIntent = new Intent(this, LoginPage.class);
-                //startActivity(signOutIntent);
-               // return true;
 
 
             default:
