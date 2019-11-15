@@ -69,11 +69,11 @@ public class RegisterPage extends AppCompatActivity {
 
         String id = userRef.push().getKey();
         //example
-        List<String> Preferences = Arrays.asList("action", "");
-        List<String> FavMovies = Arrays.asList("Avengers:Endgame", "Terminator");
-        List<String> FavTVshows = Arrays.asList("Breaking Bad", "Black Mirror", "Games of Thrones");
+        List<String> Preferences = Arrays.asList("");
+        List<String> followingMovies = Arrays.asList("");
+        List<String> followingTvShows = Arrays.asList("");
 
-        User user = new User(id, Email, Password, UserName, Preferences, FavMovies, FavTVshows);
+        User user = new User(id, Email, Password, UserName, Preferences, followingMovies, followingTvShows);
 
 
         userRef.child(UserName);

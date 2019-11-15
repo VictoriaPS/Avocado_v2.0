@@ -42,12 +42,17 @@
 
     <item
     android:id="@+id/action_moviesId"
-    android:title="סרטים"
+    android:title="סרטים חדשים"
     app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_tvShowsId"
-        android:title="סדרות"
+        android:title="סדרות חדשות"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_calendar"
+        android:title="לוח שנה"
         app:showAsAction="never"/>
 
 

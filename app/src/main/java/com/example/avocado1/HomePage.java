@@ -44,7 +44,7 @@ import java.util.List;
 
 
 public class HomePage extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     private static final String TAG = "ViewDatabase";
     private Toolbar toolbar;
@@ -59,6 +59,16 @@ public class HomePage extends AppCompatActivity
     private Button buttons[]= new Button[5];
     TextView textViewDisplayName;
     TextView textViewDisplayGenres;
+    TextView textViewDisplayFollowingMovies;
+    TextView textViewDisplayFollowingTvshows;
+    private TMDBRecyclerViewAdapter mTMDBRecyclerViewAdapter;
+
+    private static final String baseURL ="https://api.themoviedb.org/3/discover/movie?api_key=5ba2372e5f26794510a9b0987dddf17b&language=he-IL&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&year=2019";
+    //private static final String baseURI ="https://api.themoviedb.org/3";
+    //private static final String SearchURI ="https://api.themoviedb.org/3/search/movie?query=man in black&api_key=5ba2372e5f26794510a9b0987dddf17b&language=he-IL";
+    //private static final String GenresListURI ="https://api.themoviedb.org/3/genre/movie/list?api_key=5ba2372e5f26794510a9b0987dddf17b&language=he-il";
+    //private static final String TopRated_TVShowsURI =" https://api.themoviedb.org/3/tv/top_rated?api_key=5ba2372e5f26794510a9b0987dddf17b&language=he-il&page=1";
+    private static final String language ="he-IL";
 
 
     @Override
@@ -70,12 +80,15 @@ public class HomePage extends AppCompatActivity
         final FirebaseUser user = mAuth.getCurrentUser();
         textViewDisplayName = (TextView) findViewById(R.id.helloUser);
         textViewDisplayGenres= (TextView) findViewById(R.id.genres);
+        textViewDisplayFollowingMovies= (TextView) findViewById(R.id.followingMovies);
+        textViewDisplayFollowingTvshows= (TextView) findViewById(R.id.followingTvshows);
+
 
 
         toolbar = findViewById(R.id.toolbarId);
         emailNav= findViewById(R.id.emailNavBarId);
         setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
+   /*     ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         DrawerLayout drawer = findViewById(R.id.drawerLayoutId);
@@ -88,11 +101,11 @@ public class HomePage extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
+*/
         loadUserInformation();
         updateGenres(genresList);
         DisplayGenres(buttons);
-
+        DisplayFollowing();
 
 
 
@@ -130,6 +143,35 @@ public class HomePage extends AppCompatActivity
                 genres = genres.replace("]", "");
 
                 textViewDisplayGenres.setText(genres);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+
+        });
+
+    }
+
+    private void DisplayFollowing (){
+
+        myRef = FirebaseDatabase.getInstance().getReference("Users");
+        final String userName = mAuth.getCurrentUser().getDisplayName();
+
+        myRef.child(userName).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                String followingMovies = dataSnapshot.child("followingMovies").getValue().toString();
+
+                followingMovies = followingMovies.replace("[", "");
+                followingMovies = followingMovies.replace("]", "");
+
+                textViewDisplayFollowingMovies.setText(followingMovies);
+                Toast.makeText(HomePage.this, "following movies from db " + followingMovies,Toast.LENGTH_LONG).show();
+
 
             }
 
@@ -261,11 +303,18 @@ public class HomePage extends AppCompatActivity
                 return true;
 
             case R.id.action_moviesId:
-                Toast.makeText(this, "movies selected", Toast.LENGTH_LONG).show();
+                Intent MovieIntent = new Intent(this, MovieDetailActivity.class);
+                startActivity(MovieIntent);
                 return true;
 
             case R.id.action_tvShowsId:
-                Toast.makeText(this, "tvShows selected", Toast.LENGTH_LONG).show();
+                Intent TvShowsIntent = new Intent(this, TvShowDetailActivity.class);
+                startActivity(TvShowsIntent);
+                return true;
+
+            case R.id.action_calendar:
+                Intent CalendarIntent = new Intent(this, CalendarActivity.class);
+                startActivity(CalendarIntent);
                 return true;
 
 
@@ -307,4 +356,5 @@ public class HomePage extends AppCompatActivity
      return true;
 
     }
+
 }

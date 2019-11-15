@@ -12,8 +12,8 @@ public class User {
     private  String Password;
     private  String UserName;
     private List<String> Preferences = new ArrayList<>();
-    private List<String> FavoriteMovies = new ArrayList<>();
-    private List<String> FavoriteTVshows = new ArrayList<>();
+    private List<String> followingMovies = new ArrayList<>();
+    private List<String> followingTVshows = new ArrayList<>();
 
 
     public User () {
@@ -26,8 +26,8 @@ public class User {
         Password = password;
         UserName = userName;
         Preferences = preferences;
-        FavoriteMovies= favmovies;
-        FavoriteTVshows= favTVshows;
+        followingMovies= favmovies;
+        followingTVshows= favTVshows;
 
 
     }
@@ -72,20 +72,20 @@ public class User {
         Preferences = preferences;
     }
 
-    public List<String> getFavoriteMovies() {
-        return FavoriteMovies;
+    public List<String> getFollowingMovies() {
+        return followingMovies;
     }
 
-    public void setFavoriteMovies(List<String> favoriteMovies) {
-        FavoriteMovies = favoriteMovies;
+    public List<String> getFollowingTVshows() {
+        return followingTVshows;
     }
 
-    public List<String> getFavoriteTVshows() {
-        return FavoriteTVshows;
+    public void setFollowingMovies(List<String> followingMovies) {
+        this.followingMovies = followingMovies;
     }
 
-    public void setFavoriteTVshows(List<String> favoriteTVshows) {
-        FavoriteTVshows = favoriteTVshows;
+    public void setFollowingTVshows(List<String> followingTVshows) {
+        this.followingTVshows = followingTVshows;
     }
 }
 
